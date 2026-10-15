@@ -1,24 +1,24 @@
 local Lib = {}
-Lib.Version = "LzeSilent.UI v1.0.0"
+Lib.Version = "LzeSilent.UI v1.1.0"
 Lib.Flags = {}
 Lib.Windows = {}
-Lib.NotifyQueue = {}
 
 Lib.Theme = {
     BG      = Color3.fromRGB(0, 0, 0),
-    BG2     = Color3.fromRGB(10, 10, 10),
-    BG3     = Color3.fromRGB(20, 20, 20),
-    BG4     = Color3.fromRGB(28, 28, 28),
+    BG2     = Color3.fromRGB(12, 12, 12),
+    BG3     = Color3.fromRGB(22, 22, 22),
+    BG4     = Color3.fromRGB(32, 32, 32),
+    BG5     = Color3.fromRGB(45, 45, 45),
     Line    = Color3.fromRGB(255, 255, 255),
-    LineDim = Color3.fromRGB(40, 40, 40),
+    LineDim = Color3.fromRGB(60, 60, 60),
     Text    = Color3.fromRGB(255, 255, 255),
-    TextDim = Color3.fromRGB(130, 130, 130),
-    Hover   = Color3.fromRGB(24, 24, 24),
+    TextDim = Color3.fromRGB(160, 160, 160),
+    TextMute= Color3.fromRGB(100, 100, 100),
+    Hover   = Color3.fromRGB(38, 38, 38),
     OK      = Color3.fromRGB(74, 222, 128),
     WARN    = Color3.fromRGB(251, 191, 36),
     ERR     = Color3.fromRGB(248, 113, 113),
-    INFO    = Color3.fromRGB(96, 165, 250),
-    Accent  = Color3.fromRGB(255, 255, 255)
+    INFO    = Color3.fromRGB(96, 165, 250)
 }
 
 Lib.Fonts = {
@@ -158,7 +158,7 @@ end
 local function applyThemeRecursive(root)
     for _, d in ipairs(root:GetDescendants()) do
         pcall(function()
-            if d:IsA("Frame") then
+            if d:IsA("Frame") or d:IsA("TextButton") or d:IsA("TextBox") or d:IsA("ScrollingFrame") then
                 if d.Name == "ThemeBG" then
                     tw(d, Lib.TI.med, { BackgroundColor3 = Lib.Theme.BG })
                 elseif d.Name == "ThemeBG2" then
@@ -168,7 +168,8 @@ local function applyThemeRecursive(root)
                 elseif d.Name == "ThemeBG4" then
                     tw(d, Lib.TI.med, { BackgroundColor3 = Lib.Theme.BG4 })
                 end
-            elseif d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
+            end
+            if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
                 if d.Name == "ThemeText" then
                     tw(d, Lib.TI.med, { TextColor3 = Lib.Theme.Text })
                 elseif d.Name == "ThemeTextDim" then
@@ -193,7 +194,7 @@ local function initNotify()
     notifyList = inst("Frame", {
         AnchorPoint = Vector2.new(1, 0),
         Position = UDim2.new(1, -16, 0, 16),
-        Size = UDim2.new(0, 260, 1, -32),
+        Size = UDim2.new(0, 270, 1, -32),
         BackgroundTransparency = 1
     }, notifyGui)
     inst("UIListLayout", {
@@ -222,8 +223,8 @@ function Lib:Notify(cfg)
         BorderSizePixel = 0,
         ClipsDescendants = true
     }, notifyList)
-    corner(card, 4)
-    stroke(card, self.Theme.Line, 0.7, 0.15)
+    corner(card, 5)
+    stroke(card, self.Theme.Line, 0.7, 0.3)
 
     local bar = inst("Frame", {
         Size = UDim2.new(0, 3, 0, 0),
@@ -306,14 +307,14 @@ end
 function Lib:ResetTheme()
     self:SetTheme({
         BG      = Color3.fromRGB(0, 0, 0),
-        BG2     = Color3.fromRGB(10, 10, 10),
-        BG3     = Color3.fromRGB(20, 20, 20),
-        BG4     = Color3.fromRGB(28, 28, 28),
+        BG2     = Color3.fromRGB(12, 12, 12),
+        BG3     = Color3.fromRGB(22, 22, 22),
+        BG4     = Color3.fromRGB(32, 32, 32),
         Line    = Color3.fromRGB(255, 255, 255),
-        LineDim = Color3.fromRGB(40, 40, 40),
+        LineDim = Color3.fromRGB(60, 60, 60),
         Text    = Color3.fromRGB(255, 255, 255),
-        TextDim = Color3.fromRGB(130, 130, 130),
-        Hover   = Color3.fromRGB(24, 24, 24)
+        TextDim = Color3.fromRGB(160, 160, 160),
+        Hover   = Color3.fromRGB(38, 38, 38)
     })
 end
 
@@ -328,7 +329,7 @@ local function updateSectionSize(sec)
             sec.Container.Size = UDim2.new(1, 0, 0, h)
         end
         if sec.Frame then
-            sec.Frame.Size = UDim2.new(1, 0, 0, h + 36)
+            sec.Frame.Size = UDim2.new(1, 0, 0, h + 40)
         end
     end)
 end
@@ -341,15 +342,15 @@ local function mkElementFrame(parent, h)
         Name = "ThemeBG3",
         ClipsDescendants = true
     }, parent)
-    corner(f, 4)
-    local s = stroke(f, Lib.Theme.Line, 0.6, 0.75)
+    corner(f, 5)
+    local s = stroke(f, Lib.Theme.LineDim, 0.7, 0.4)
     return f, s
 end
 
 local function addTitleDesc(frame, name, desc)
     local tl = inst("TextLabel", {
-        Size = UDim2.new(1, -100, 0, 14),
-        Position = UDim2.new(0, 10, 0, 6),
+        Size = UDim2.new(1, -110, 0, 14),
+        Position = UDim2.new(0, 12, 0, 7),
         BackgroundTransparency = 1,
         Text = name,
         TextColor3 = Lib.Theme.Text,
@@ -362,8 +363,8 @@ local function addTitleDesc(frame, name, desc)
 
     if desc and desc ~= "" then
         inst("TextLabel", {
-            Size = UDim2.new(1, -20, 0, 12),
-            Position = UDim2.new(0, 10, 0, 20),
+            Size = UDim2.new(1, -24, 0, 12),
+            Position = UDim2.new(0, 12, 0, 22),
             BackgroundTransparency = 1,
             Text = desc,
             TextColor3 = Lib.Theme.TextDim,
@@ -373,9 +374,9 @@ local function addTitleDesc(frame, name, desc)
             TextTruncate = Enum.TextTruncate.AtEnd,
             Name = "ThemeTextDim"
         }, frame)
-        return tl, 34
+        return tl, 36
     end
-    return tl, 22
+    return tl, 24
 end
 
 function Section:AddButton(cfg)
@@ -384,7 +385,7 @@ function Section:AddButton(cfg)
     local desc = cfg.Description
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 36 or 26)
+    local f, s = mkElementFrame(self.Container, desc and 40 or 30)
     addTitleDesc(f, name, desc)
 
     local btn = inst("TextButton", {
@@ -396,11 +397,11 @@ function Section:AddButton(cfg)
 
     btn.MouseEnter:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.Hover })
-        tw(s, Lib.TI.fast, { Transparency = 0.2 })
+        tw(s, Lib.TI.fast, { Transparency = 0.1 })
     end)
     btn.MouseLeave:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.BG3 })
-        tw(s, Lib.TI.fast, { Transparency = 0.75 })
+        tw(s, Lib.TI.fast, { Transparency = 0.4 })
     end)
     btn.MouseButton1Down:Connect(function()
         tw(f, Lib.TI.tap, { BackgroundColor3 = Lib.Theme.BG2 })
@@ -425,27 +426,26 @@ function Section:AddToggle(cfg)
     local default = cfg.Default or false
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 36 or 26)
+    local f, s = mkElementFrame(self.Container, desc and 40 or 30)
     addTitleDesc(f, name, desc)
 
     local sw = inst("Frame", {
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -10, 0.5, 0),
-        Size = UDim2.new(0, 34, 0, 18),
+        Position = UDim2.new(1, -12, 0.5, 0),
+        Size = UDim2.new(0, 36, 0, 20),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2"
     }, f)
-    corner(sw, 9)
-    local sws = stroke(sw, Lib.Theme.Line, 0.7, 0.5)
+    corner(sw, 10)
+    local sws = stroke(sw, Lib.Theme.LineDim, 0.8, 0.3)
 
     local knob = inst("Frame", {
         AnchorPoint = Vector2.new(0, 0.5),
         Position = UDim2.new(0, 2, 0.5, 0),
-        Size = UDim2.new(0, 14, 0, 14),
-        BackgroundColor3 = Lib.Theme.TextDim,
-        BorderSizePixel = 0,
-        Name = "ThemeTextDim"
+        Size = UDim2.new(0, 16, 0, 16),
+        BackgroundColor3 = Lib.Theme.TextMute,
+        BorderSizePixel = 0
     }, sw)
     corner(knob, 9)
 
@@ -454,16 +454,16 @@ function Section:AddToggle(cfg)
 
     local function render()
         if state then
-            tw(sws, Lib.TI.med, { Transparency = 0 })
+            tw(sws, Lib.TI.med, { Transparency = 0, Color = Lib.Theme.Line })
             tw(knob, Lib.TI.spring, {
-                Position = UDim2.new(1, -16, 0.5, 0),
+                Position = UDim2.new(1, -18, 0.5, 0),
                 BackgroundColor3 = Lib.Theme.Text
             })
         else
-            tw(sws, Lib.TI.med, { Transparency = 0.5 })
+            tw(sws, Lib.TI.med, { Transparency = 0.3, Color = Lib.Theme.LineDim })
             tw(knob, Lib.TI.spring, {
                 Position = UDim2.new(0, 2, 0.5, 0),
-                BackgroundColor3 = Lib.Theme.TextDim
+                BackgroundColor3 = Lib.Theme.TextMute
             })
         end
     end
@@ -477,11 +477,11 @@ function Section:AddToggle(cfg)
     }, f)
     btn.MouseEnter:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.Hover })
-        tw(s, Lib.TI.fast, { Transparency = 0.2 })
+        tw(s, Lib.TI.fast, { Transparency = 0.1 })
     end)
     btn.MouseLeave:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.BG3 })
-        tw(s, Lib.TI.fast, { Transparency = 0.75 })
+        tw(s, Lib.TI.fast, { Transparency = 0.4 })
     end)
     btn.MouseButton1Click:Connect(function()
         ripple(btn)
@@ -516,13 +516,13 @@ function Section:AddSlider(cfg)
     local suffix = cfg.Suffix or ""
     local decimals = cfg.Decimals or 0
 
-    local f, s = mkElementFrame(self.Container, desc and 50 or 38)
+    local f, s = mkElementFrame(self.Container, desc and 54 or 42)
     local _, usedH = addTitleDesc(f, name, desc)
 
     local valueLbl = inst("TextLabel", {
         AnchorPoint = Vector2.new(1, 0),
-        Position = UDim2.new(1, -10, 0, 6),
-        Size = UDim2.new(0, 90, 0, 14),
+        Position = UDim2.new(1, -12, 0, 7),
+        Size = UDim2.new(0, 100, 0, 14),
         BackgroundTransparency = 1,
         Text = tostring(default) .. suffix,
         TextColor3 = Lib.Theme.Text,
@@ -533,32 +533,31 @@ function Section:AddSlider(cfg)
     }, f)
 
     local barBg = inst("Frame", {
-        Position = UDim2.new(0, 10, 0, usedH + 6),
-        Size = UDim2.new(1, -20, 0, 6),
+        Position = UDim2.new(0, 12, 0, usedH + 6),
+        Size = UDim2.new(1, -24, 0, 6),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2"
     }, f)
     corner(barBg, 3)
-    stroke(barBg, Lib.Theme.Line, 0.5, 0.75)
+    stroke(barBg, Lib.Theme.LineDim, 0.6, 0.4)
 
     local barFill = inst("Frame", {
         Size = UDim2.new(0, 0, 1, 0),
         BackgroundColor3 = Lib.Theme.Text,
-        BorderSizePixel = 0,
-        Name = "ThemeText"
+        BorderSizePixel = 0
     }, barBg)
     corner(barFill, 3)
 
     local knob = inst("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0, 0, 0.5, 0),
-        Size = UDim2.new(0, 12, 0, 12),
+        Size = UDim2.new(0, 14, 0, 14),
         BackgroundColor3 = Lib.Theme.Text,
-        BorderSizePixel = 0,
-        Name = "ThemeText"
+        BorderSizePixel = 0
     }, barBg)
     corner(knob, 9)
+    stroke(knob, Lib.Theme.BG, 1, 0)
 
     local value = math.clamp(default, min, max)
     Lib.Flags[flag] = value
@@ -635,7 +634,7 @@ function Section:AddDropdown(cfg)
     local multi = cfg.Multi or false
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 40 or 28)
+    local f, s = mkElementFrame(self.Container, desc and 44 or 32)
     addTitleDesc(f, name, desc)
 
     local selected = {}
@@ -660,8 +659,8 @@ function Section:AddDropdown(cfg)
 
     local valueLbl = inst("TextLabel", {
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -30, 0.5, 0),
-        Size = UDim2.new(0, 180, 0, 14),
+        Position = UDim2.new(1, -32, 0.5, 0),
+        Size = UDim2.new(0, 190, 0, 14),
         BackgroundTransparency = 1,
         Text = selectedText(),
         TextColor3 = Lib.Theme.Text,
@@ -674,7 +673,7 @@ function Section:AddDropdown(cfg)
 
     local arrow = inst("TextLabel", {
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -8, 0.5, 0),
+        Position = UDim2.new(1, -10, 0.5, 0),
         Size = UDim2.new(0, 14, 0, 14),
         BackgroundTransparency = 1,
         Text = "▾",
@@ -693,17 +692,17 @@ function Section:AddDropdown(cfg)
     }, f)
     btn.MouseEnter:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.Hover })
-        tw(s, Lib.TI.fast, { Transparency = 0.2 })
+        tw(s, Lib.TI.fast, { Transparency = 0.1 })
     end)
     btn.MouseLeave:Connect(function()
         tw(f, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.BG3 })
-        tw(s, Lib.TI.fast, { Transparency = 0.75 })
+        tw(s, Lib.TI.fast, { Transparency = 0.4 })
     end)
 
     local open = false
     local panel = inst("Frame", {
         Size = UDim2.new(1, 0, 0, 0),
-        Position = UDim2.new(0, 0, 1, 2),
+        Position = UDim2.new(0, 0, 1, 3),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         ClipsDescendants = true,
@@ -711,8 +710,8 @@ function Section:AddDropdown(cfg)
         Visible = false,
         Name = "ThemeBG2"
     }, f)
-    corner(panel, 4)
-    stroke(panel, Lib.Theme.Line, 0.6, 0.5)
+    corner(panel, 5)
+    stroke(panel, Lib.Theme.LineDim, 0.7, 0.2)
     inst("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 2)
@@ -721,7 +720,7 @@ function Section:AddDropdown(cfg)
 
     for i, opt in ipairs(options) do
         local ob = inst("TextButton", {
-            Size = UDim2.new(1, 0, 0, 20),
+            Size = UDim2.new(1, 0, 0, 22),
             BackgroundColor3 = Lib.Theme.BG2,
             BorderSizePixel = 0,
             Text = "  " .. tostring(opt),
@@ -763,7 +762,7 @@ function Section:AddDropdown(cfg)
         tw(arrow, Lib.TI.med, { Rotation = state and 180 or 0 })
         if state then
             panel.Visible = true
-            local h = math.min(#options * 22 + 8, 180)
+            local h = math.min(#options * 24 + 8, 200)
             panel.Size = UDim2.new(1, 0, 0, 0)
             tw(panel, Lib.TI.drift, { Size = UDim2.new(1, 0, 0, h) })
         else
@@ -808,17 +807,17 @@ function Section:AddTextBox(cfg)
     local clear = cfg.ClearOnFocus or false
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 50 or 38)
+    local f, s = mkElementFrame(self.Container, desc and 54 or 42)
     local _, usedH = addTitleDesc(f, name, desc)
 
     local tb = inst("TextBox", {
-        Position = UDim2.new(0, 10, 0, usedH + 2),
-        Size = UDim2.new(1, -20, 0, 20),
+        Position = UDim2.new(0, 12, 0, usedH + 4),
+        Size = UDim2.new(1, -24, 0, 22),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         Text = default,
         PlaceholderText = placeholder,
-        PlaceholderColor3 = Lib.Theme.TextDim,
+        PlaceholderColor3 = Lib.Theme.TextMute,
         TextColor3 = Lib.Theme.Text,
         Font = Lib.Fonts.Regular,
         TextSize = 10,
@@ -826,17 +825,17 @@ function Section:AddTextBox(cfg)
         ClearTextOnFocus = clear,
         Name = "ThemeBG2"
     }, f)
-    corner(tb, 3)
-    local tbs = stroke(tb, Lib.Theme.Line, 0.6, 0.6)
-    pad(tb, 6, 6, 8, 8)
+    corner(tb, 4)
+    local tbs = stroke(tb, Lib.Theme.LineDim, 0.7, 0.4)
+    pad(tb, 8, 8, 8, 8)
 
     tb.Focused:Connect(function()
-        tw(tbs, Lib.TI.fast, { Transparency = 0 })
-        tw(s, Lib.TI.fast, { Transparency = 0.2 })
+        tw(tbs, Lib.TI.fast, { Transparency = 0, Color = Lib.Theme.Line })
+        tw(s, Lib.TI.fast, { Transparency = 0.1 })
     end)
     tb.FocusLost:Connect(function(enter)
-        tw(tbs, Lib.TI.fast, { Transparency = 0.6 })
-        tw(s, Lib.TI.fast, { Transparency = 0.75 })
+        tw(tbs, Lib.TI.fast, { Transparency = 0.4, Color = Lib.Theme.LineDim })
+        tw(s, Lib.TI.fast, { Transparency = 0.4 })
         Lib.Flags[flag] = tb.Text
         pcall(callback, tb.Text, enter)
     end)
@@ -861,7 +860,7 @@ function Section:AddKeybind(cfg)
     local default = cfg.Default or Enum.KeyCode.RightShift
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 36 or 26)
+    local f, s = mkElementFrame(self.Container, desc and 40 or 30)
     addTitleDesc(f, name, desc)
 
     local current = default
@@ -869,8 +868,8 @@ function Section:AddKeybind(cfg)
 
     local keyLbl = inst("TextButton", {
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -10, 0.5, 0),
-        Size = UDim2.new(0, 90, 0, 20),
+        Position = UDim2.new(1, -12, 0.5, 0),
+        Size = UDim2.new(0, 96, 0, 22),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         Text = current.Name,
@@ -880,15 +879,15 @@ function Section:AddKeybind(cfg)
         AutoButtonColor = false,
         Name = "ThemeBG2"
     }, f)
-    corner(keyLbl, 3)
-    local kls = stroke(keyLbl, Lib.Theme.Line, 0.6, 0.5)
+    corner(keyLbl, 4)
+    local kls = stroke(keyLbl, Lib.Theme.LineDim, 0.7, 0.3)
 
     local listening = false
     keyLbl.MouseEnter:Connect(function()
-        tw(kls, Lib.TI.fast, { Transparency = 0 })
+        tw(kls, Lib.TI.fast, { Transparency = 0, Color = Lib.Theme.Line })
     end)
     keyLbl.MouseLeave:Connect(function()
-        tw(kls, Lib.TI.fast, { Transparency = 0.5 })
+        tw(kls, Lib.TI.fast, { Transparency = 0.3, Color = Lib.Theme.LineDim })
     end)
     keyLbl.MouseButton1Click:Connect(function()
         if listening then return end
@@ -903,14 +902,14 @@ function Section:AddKeybind(cfg)
                 keyLbl.Text = current.Name
                 Lib.Flags[flag] = current
                 listening = false
-                tw(kls, Lib.TI.fast, { Color = Lib.Theme.Line })
+                tw(kls, Lib.TI.fast, { Color = Lib.Theme.LineDim })
                 pcall(callback, current)
                 conn:Disconnect()
             elseif i.UserInputType == Enum.UserInputType.MouseButton1
             or i.UserInputType == Enum.UserInputType.MouseButton2 then
                 keyLbl.Text = current.Name
                 listening = false
-                tw(kls, Lib.TI.fast, { Color = Lib.Theme.Line })
+                tw(kls, Lib.TI.fast, { Color = Lib.Theme.LineDim })
                 conn:Disconnect()
             end
         end)
@@ -942,12 +941,12 @@ function Section:AddLabel(cfg)
     local size = cfg.TextSize or 10
 
     local f = inst("Frame", {
-        Size = UDim2.new(1, 0, 0, 18),
+        Size = UDim2.new(1, 0, 0, 20),
         BackgroundTransparency = 1
     }, self.Container)
     inst("TextLabel", {
-        Size = UDim2.new(1, -8, 1, 0),
-        Position = UDim2.new(0, 4, 0, 0),
+        Size = UDim2.new(1, -12, 1, 0),
+        Position = UDim2.new(0, 6, 0, 0),
         BackgroundTransparency = 1,
         Text = text,
         TextColor3 = color,
@@ -966,18 +965,18 @@ function Section:AddParagraph(cfg)
     local text = cfg.Text or ""
 
     local f = inst("Frame", {
-        Size = UDim2.new(1, 0, 0, 40),
+        Size = UDim2.new(1, 0, 0, 44),
         BackgroundColor3 = Lib.Theme.BG3,
         BorderSizePixel = 0,
         Name = "ThemeBG3",
         ClipsDescendants = true
     }, self.Container)
-    corner(f, 4)
-    stroke(f, Lib.Theme.Line, 0.6, 0.75)
+    corner(f, 5)
+    stroke(f, Lib.Theme.LineDim, 0.7, 0.4)
 
     inst("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 14),
-        Position = UDim2.new(0, 10, 0, 6),
+        Size = UDim2.new(1, -24, 0, 14),
+        Position = UDim2.new(0, 12, 0, 8),
         BackgroundTransparency = 1,
         Text = title,
         TextColor3 = Lib.Theme.Text,
@@ -987,8 +986,8 @@ function Section:AddParagraph(cfg)
         Name = "ThemeText"
     }, f)
     local body = inst("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 0),
-        Position = UDim2.new(0, 10, 0, 22),
+        Size = UDim2.new(1, -24, 0, 0),
+        Position = UDim2.new(0, 12, 0, 26),
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
         Text = text,
@@ -1002,7 +1001,7 @@ function Section:AddParagraph(cfg)
     }, f)
 
     task.defer(function()
-        local h = 34 + (body.AbsoluteSize.Y or 14)
+        local h = 38 + (body.AbsoluteSize.Y or 14)
         f.Size = UDim2.new(1, 0, 0, h)
     end)
 
@@ -1012,10 +1011,10 @@ end
 
 function Section:AddDivider()
     local f = inst("Frame", {
-        Size = UDim2.new(1, -8, 0, 1),
+        Size = UDim2.new(1, -12, 0, 1),
         BackgroundColor3 = Lib.Theme.LineDim,
-        BorderSizePixel = 0,
-        Name = "ThemeLineDim"
+        BackgroundTransparency = 0.4,
+        BorderSizePixel = 0
     }, self.Container)
     updateSectionSize(self)
     return { Frame = f }
@@ -1029,18 +1028,18 @@ function Section:AddColorPicker(cfg)
     local default = cfg.Default or Color3.fromRGB(255, 255, 255)
     local callback = cfg.Callback or function() end
 
-    local f, s = mkElementFrame(self.Container, desc and 40 or 30)
+    local f, s = mkElementFrame(self.Container, desc and 44 or 32)
     addTitleDesc(f, name, desc)
 
     local swatch = inst("Frame", {
         AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, -10, 0.5, 0),
-        Size = UDim2.new(0, 40, 0, 20),
+        Position = UDim2.new(1, -12, 0.5, 0),
+        Size = UDim2.new(0, 44, 0, 22),
         BackgroundColor3 = default,
         BorderSizePixel = 0
     }, f)
-    corner(swatch, 3)
-    stroke(swatch, Lib.Theme.Line, 0.6, 0.4)
+    corner(swatch, 4)
+    stroke(swatch, Lib.Theme.LineDim, 0.7, 0.3)
 
     Lib.Flags[flag] = default
 
@@ -1060,7 +1059,7 @@ function Section:AddColorPicker(cfg)
     local open = false
     local panel = inst("Frame", {
         Size = UDim2.new(1, 0, 0, 0),
-        Position = UDim2.new(0, 0, 1, 2),
+        Position = UDim2.new(0, 0, 1, 3),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         ClipsDescendants = true,
@@ -1068,25 +1067,25 @@ function Section:AddColorPicker(cfg)
         ZIndex = 10,
         Name = "ThemeBG2"
     }, f)
-    corner(panel, 4)
-    stroke(panel, Lib.Theme.Line, 0.6, 0.5)
+    corner(panel, 5)
+    stroke(panel, Lib.Theme.LineDim, 0.7, 0.2)
 
     local hexInput = inst("TextBox", {
-        Position = UDim2.new(0, 6, 0, 6),
-        Size = UDim2.new(1, -12, 0, 22),
+        Position = UDim2.new(0, 8, 0, 8),
+        Size = UDim2.new(1, -16, 0, 24),
         BackgroundColor3 = Lib.Theme.BG3,
         BorderSizePixel = 0,
         Text = rgbToHex(default),
         PlaceholderText = "#FFFFFF",
-        PlaceholderColor3 = Lib.Theme.TextDim,
+        PlaceholderColor3 = Lib.Theme.TextMute,
         TextColor3 = Lib.Theme.Text,
         Font = Lib.Fonts.Mono,
         TextSize = 11,
         TextXAlignment = Enum.TextXAlignment.Center,
         Name = "ThemeBG3"
     }, panel)
-    corner(hexInput, 3)
-    stroke(hexInput, Lib.Theme.Line, 0.5, 0.6)
+    corner(hexInput, 4)
+    stroke(hexInput, Lib.Theme.LineDim, 0.6, 0.4)
     pad(hexInput, 4)
 
     local function applyColor(c, cb)
@@ -1110,7 +1109,7 @@ function Section:AddColorPicker(cfg)
         if state then
             panel.Visible = true
             panel.Size = UDim2.new(1, 0, 0, 0)
-            tw(panel, Lib.TI.drift, { Size = UDim2.new(1, 0, 0, 38) })
+            tw(panel, Lib.TI.drift, { Size = UDim2.new(1, 0, 0, 44) })
         else
             local t = tw(panel, Lib.TI.med, { Size = UDim2.new(1, 0, 0, 0) })
             t.Completed:Connect(function()
@@ -1137,18 +1136,18 @@ TabMeta.__index = TabMeta
 
 function TabMeta:CreateSection(title)
     local frame = inst("Frame", {
-        Size = UDim2.new(1, 0, 0, 30),
+        Size = UDim2.new(1, 0, 0, 32),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2",
         ClipsDescendants = true
     }, self.Page)
-    corner(frame, 4)
-    stroke(frame, Lib.Theme.Line, 0.6, 0.7)
+    corner(frame, 5)
+    stroke(frame, Lib.Theme.LineDim, 0.7, 0.4)
 
     inst("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 26),
-        Position = UDim2.new(0, 10, 0, 0),
+        Size = UDim2.new(1, -24, 0, 28),
+        Position = UDim2.new(0, 12, 0, 0),
         BackgroundTransparency = 1,
         Text = title,
         TextColor3 = Lib.Theme.Text,
@@ -1160,7 +1159,7 @@ function TabMeta:CreateSection(title)
 
     local container = inst("Frame", {
         Size = UDim2.new(1, -12, 0, 0),
-        Position = UDim2.new(0, 6, 0, 30),
+        Position = UDim2.new(0, 6, 0, 32),
         BackgroundTransparency = 1
     }, frame)
     local layout = inst("UIListLayout", {
@@ -1191,7 +1190,7 @@ function Lib:CreateWindow(cfg)
     cfg = cfg or {}
     local winName  = cfg.Title or "LzeSilent"
     local subtitle = cfg.Subtitle or Lib.Version
-    local winSize  = cfg.Size or UDim2.fromOffset(520, 340)
+    local winSize  = cfg.Size or UDim2.fromOffset(520, 350)
     local toggleKey = cfg.ToggleKey or Enum.KeyCode.RightControl
     local footer = cfg.Footer
 
@@ -1213,28 +1212,30 @@ function Lib:CreateWindow(cfg)
         Visible = false,
         Name = "ThemeBG"
     }, gui)
-    corner(main, 6)
-    stroke(main, self.Theme.Line, 0.7, 0.15)
+    corner(main, 8)
+    stroke(main, self.Theme.Line, 0.8, 0.2)
 
     local titleBar = inst("Frame", {
-        Size = UDim2.new(1, 0, 0, 30),
+        Size = UDim2.new(1, 0, 0, 32),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2",
         ClipsDescendants = true
-    }, main)
+    }, titleBar_parent_or_main)
+
+    titleBar.Parent = main
 
     inst("Frame", {
         Size = UDim2.new(1, 0, 0, 1),
         Position = UDim2.new(0, 0, 1, -1),
         BackgroundColor3 = self.Theme.LineDim,
-        BorderSizePixel = 0,
-        Name = "ThemeLineDim"
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0
     }, titleBar)
 
     local titleHolder = inst("Frame", {
-        Size = UDim2.new(0, 200, 0, 16),
-        Position = UDim2.new(0, 8, 0.5, 0),
+        Size = UDim2.new(0, 220, 0, 18),
+        Position = UDim2.new(0, 10, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundTransparency = 1
     }, titleBar)
@@ -1247,7 +1248,7 @@ function Lib:CreateWindow(cfg)
         TextColor3 = Color3.fromRGB(0, 0, 0),
         TextTransparency = 0.3,
         Font = self.Fonts.Bold,
-        TextSize = 11,
+        TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left
     }, titleHolder)
 
@@ -1257,15 +1258,15 @@ function Lib:CreateWindow(cfg)
         Text = winName,
         TextColor3 = self.Theme.Text,
         Font = self.Fonts.Bold,
-        TextSize = 11,
+        TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
         Name = "ThemeText"
     }, titleHolder)
-    stroke(tMain, self.Theme.Line, 0.5, 0.55, Enum.ApplyStrokeMode.Contextual)
+    stroke(tMain, self.Theme.Line, 0.5, 0.6, Enum.ApplyStrokeMode.Contextual)
 
     inst("TextLabel", {
-        Size = UDim2.new(0, 140, 1, 0),
-        Position = UDim2.new(0, 100, 0, 0),
+        Size = UDim2.new(0, 160, 1, 0),
+        Position = UDim2.new(0, 110, 0, 0),
         BackgroundTransparency = 1,
         Text = subtitle,
         TextColor3 = self.Theme.TextDim,
@@ -1279,35 +1280,35 @@ function Lib:CreateWindow(cfg)
         local b = inst("TextButton", {
             AnchorPoint = Vector2.new(1, 0.5),
             Position = UDim2.new(1, x, 0.5, 0),
-            Size = UDim2.new(0, 22, 0, 22),
+            Size = UDim2.new(0, 24, 0, 24),
             BackgroundColor3 = self.Theme.BG3,
             BorderSizePixel = 0,
             Text = sym,
             TextColor3 = isClose and self.Theme.ERR or self.Theme.Text,
             Font = self.Fonts.Regular,
-            TextSize = 12,
+            TextSize = 13,
             AutoButtonColor = false,
             Name = "ThemeBG3"
         }, titleBar)
-        corner(b, 4)
-        local s = stroke(b, self.Theme.LineDim, 1, 0.5)
+        corner(b, 5)
+        local s = stroke(b, self.Theme.LineDim, 0.8, 0.3)
         b.MouseEnter:Connect(function()
-            tw(b, Lib.TI.fast, { BackgroundColor3 = isClose and Color3.fromRGB(60, 25, 25) or self.Theme.Hover })
+            tw(b, Lib.TI.fast, { BackgroundColor3 = isClose and Color3.fromRGB(70, 28, 28) or self.Theme.Hover })
             tw(s, Lib.TI.fast, { Transparency = 0 })
         end)
         b.MouseLeave:Connect(function()
             tw(b, Lib.TI.fast, { BackgroundColor3 = self.Theme.BG3 })
-            tw(s, Lib.TI.fast, { Transparency = 0.5 })
+            tw(s, Lib.TI.fast, { Transparency = 0.3 })
         end)
         return b
     end
 
-    local btnClose = mkCtrl("×", -10, true)
-    local btnMin   = mkCtrl("—", -36, false)
+    local btnClose = mkCtrl("×", -12, true)
+    local btnMin   = mkCtrl("—", -42, false)
 
     local body = inst("Frame", {
-        Position = UDim2.new(0, 0, 0, 31),
-        Size = UDim2.new(1, 0, 1, -31),
+        Position = UDim2.new(0, 0, 0, 33),
+        Size = UDim2.new(1, 0, 1, -33),
         BackgroundColor3 = self.Theme.BG,
         BorderSizePixel = 0,
         Name = "ThemeBG",
@@ -1315,7 +1316,7 @@ function Lib:CreateWindow(cfg)
     }, main)
 
     local sidebar = inst("Frame", {
-        Size = UDim2.new(0, 120, 1, 0),
+        Size = UDim2.new(0, 130, 1, 0),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2",
@@ -1326,23 +1327,23 @@ function Lib:CreateWindow(cfg)
         Size = UDim2.new(0, 1, 1, 0),
         Position = UDim2.new(1, -1, 0, 0),
         BackgroundColor3 = self.Theme.LineDim,
-        BorderSizePixel = 0,
-        Name = "ThemeLineDim"
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0
     }, sidebar)
 
     local tabList = inst("Frame", {
-        Position = UDim2.new(0, 6, 0, 8),
-        Size = UDim2.new(1, -12, 1, -16),
+        Position = UDim2.new(0, 8, 0, 8),
+        Size = UDim2.new(1, -16, 1, -16),
         BackgroundTransparency = 1
     }, sidebar)
     inst("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 4)
+        Padding = UDim.new(0, 5)
     }, tabList)
 
     local content = inst("Frame", {
-        Position = UDim2.new(0, 121, 0, 0),
-        Size = UDim2.new(1, -121, 1, 0),
+        Position = UDim2.new(0, 131, 0, 0),
+        Size = UDim2.new(1, -131, 1, 0),
         BackgroundColor3 = self.Theme.BG,
         BorderSizePixel = 0,
         ClipsDescendants = true,
@@ -1351,11 +1352,11 @@ function Lib:CreateWindow(cfg)
 
     if footer then
         inst("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 16),
-            Position = UDim2.new(0, 0, 1, -18),
+            Size = UDim2.new(1, 0, 0, 18),
+            Position = UDim2.new(0, 0, 1, -20),
             BackgroundTransparency = 1,
             Text = footer,
-            TextColor3 = self.Theme.TextDim,
+            TextColor3 = self.Theme.TextMute,
             Font = self.Fonts.Regular,
             TextSize = 9,
             TextXAlignment = Enum.TextXAlignment.Center,
@@ -1421,9 +1422,9 @@ function Lib:CreateWindow(cfg)
         Window.Minimized = not Window.Minimized
         if Window.Minimized then
             tw(body, Lib.TI.drift, { Size = UDim2.new(1, 0, 0, 0) })
-            tw(main, Lib.TI.drift, { Size = UDim2.new(0, winSize.X.Offset, 0, 31) })
+            tw(main, Lib.TI.drift, { Size = UDim2.new(0, winSize.X.Offset, 0, 33) })
         else
-            tw(body, Lib.TI.drift, { Size = UDim2.new(1, 0, 1, -31) })
+            tw(body, Lib.TI.drift, { Size = UDim2.new(1, 0, 1, -33) })
             tw(main, Lib.TI.spring, { Size = UDim2.new(0, winSize.X.Offset, 0, winSize.Y.Offset) })
         end
     end)
@@ -1439,34 +1440,34 @@ function Lib:CreateWindow(cfg)
 
     function Window:CreateTab(name)
         local btn = inst("TextButton", {
-            Size = UDim2.new(1, 0, 0, 26),
-            BackgroundColor3 = self.Theme.BG2,
+            Size = UDim2.new(1, 0, 0, 30),
+            BackgroundColor3 = self.Theme.BG3,
             BorderSizePixel = 0,
-            Text = "  " .. name,
+            Text = "   " .. name,
             TextColor3 = self.Theme.TextDim,
             Font = self.Fonts.Regular,
             TextSize = 11,
             TextXAlignment = Enum.TextXAlignment.Left,
             AutoButtonColor = false,
             LayoutOrder = #Window.Tabs + 1,
-            Name = "ThemeBG2"
+            Name = "ThemeBG3"
         }, tabList)
-        corner(btn, 4)
-        local st = stroke(btn, self.Theme.Line, 0.7, 0.75)
+        corner(btn, 5)
+        local st = stroke(btn, self.Theme.LineDim, 0.7, 0.5)
 
         local page = inst("ScrollingFrame", {
             Size = UDim2.new(1, 0, 1, 0),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             ScrollBarThickness = 3,
-            ScrollBarImageColor3 = self.Theme.Line,
+            ScrollBarImageColor3 = self.Theme.LineDim,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             Visible = false,
             ClipsDescendants = true,
             ScrollingDirection = Enum.ScrollingDirection.Y
         }, content)
-        pad(page, 10)
+        pad(page, 12)
         inst("UIListLayout", {
             SortOrder = Enum.SortOrder.LayoutOrder,
             Padding = UDim.new(0, 8)
@@ -1482,13 +1483,13 @@ function Lib:CreateWindow(cfg)
         btn.MouseEnter:Connect(function()
             if Window.ActiveTab ~= Tab then
                 tw(btn, Lib.TI.fast, { BackgroundColor3 = self.Theme.Hover })
-                tw(st, Lib.TI.fast, { Transparency = 0.3 })
+                tw(st, Lib.TI.fast, { Transparency = 0.2 })
             end
         end)
         btn.MouseLeave:Connect(function()
             if Window.ActiveTab ~= Tab then
-                tw(btn, Lib.TI.fast, { BackgroundColor3 = self.Theme.BG2 })
-                tw(st, Lib.TI.fast, { Transparency = 0.75 })
+                tw(btn, Lib.TI.fast, { BackgroundColor3 = self.Theme.BG3 })
+                tw(st, Lib.TI.fast, { Transparency = 0.5 })
             end
         end)
         btn.MouseButton1Click:Connect(function()
@@ -1506,16 +1507,16 @@ function Lib:CreateWindow(cfg)
         for _, t in ipairs(Window.Tabs) do
             if t == Tab then
                 t.Page.Visible = true
-                t.Page.Position = UDim2.new(0, 12, 0, 0)
+                t.Page.Position = UDim2.new(0, 14, 0, 0)
                 tw(t.Page, self.TI.drift, { Position = UDim2.new(0, 0, 0, 0) })
                 tw(t.Button, self.TI.med, {
-                    BackgroundColor3 = self.Theme.BG3,
+                    BackgroundColor3 = self.Theme.BG5,
                     TextColor3 = self.Theme.Text
                 })
             else
                 t.Page.Visible = false
                 tw(t.Button, self.TI.med, {
-                    BackgroundColor3 = self.Theme.BG2,
+                    BackgroundColor3 = self.Theme.BG3,
                     TextColor3 = self.Theme.TextDim
                 })
             end
@@ -1525,6 +1526,17 @@ function Lib:CreateWindow(cfg)
 
     self.Windows[winName] = Window
     task.wait(0.05)
+
+    if #Window.Tabs == 0 then
+        local auto = Window:CreateTab("Main")
+        local welcome = auto:CreateSection("Welcome")
+        welcome:AddParagraph({
+            Title = "LzeSilent.UI " .. Lib.Version,
+            Text = "Ready. Buat tab baru pake Window:CreateTab(\"name\") lalu Section:AddButton / AddToggle / AddSlider / AddDropdown / AddTextBox / AddKeybind / AddColorPicker / AddLabel / AddParagraph / AddDivider."
+        })
+        welcome:AddLabel({ Text = "Made by Lze" })
+    end
+
     setVisible(true)
     return Window
 end
@@ -1552,11 +1564,11 @@ function Lib:CreateScriptEditor(cfg)
         Visible = false,
         Name = "ThemeBG"
     }, gui)
-    corner(main, 6)
-    stroke(main, self.Theme.Line, 0.7, 0.15)
+    corner(main, 8)
+    stroke(main, self.Theme.Line, 0.8, 0.2)
 
     local titleBar = inst("Frame", {
-        Size = UDim2.new(1, 0, 0, 30),
+        Size = UDim2.new(1, 0, 0, 32),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
         Name = "ThemeBG2",
@@ -1566,13 +1578,13 @@ function Lib:CreateScriptEditor(cfg)
         Size = UDim2.new(1, 0, 0, 1),
         Position = UDim2.new(0, 0, 1, -1),
         BackgroundColor3 = self.Theme.LineDim,
-        BorderSizePixel = 0,
-        Name = "ThemeLineDim"
+        BackgroundTransparency = 0.3,
+        BorderSizePixel = 0
     }, titleBar)
 
     local titleHolder = inst("Frame", {
-        Size = UDim2.new(0, 220, 0, 16),
-        Position = UDim2.new(0, 8, 0.5, 0),
+        Size = UDim2.new(0, 240, 0, 18),
+        Position = UDim2.new(0, 10, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundTransparency = 1
     }, titleBar)
@@ -1584,7 +1596,7 @@ function Lib:CreateScriptEditor(cfg)
         TextColor3 = Color3.fromRGB(0, 0, 0),
         TextTransparency = 0.3,
         Font = self.Fonts.Bold,
-        TextSize = 11,
+        TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left
     }, titleHolder)
     local tMain = inst("TextLabel", {
@@ -1593,42 +1605,42 @@ function Lib:CreateScriptEditor(cfg)
         Text = winName,
         TextColor3 = self.Theme.Text,
         Font = self.Fonts.Bold,
-        TextSize = 11,
+        TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
         Name = "ThemeText"
     }, titleHolder)
-    stroke(tMain, self.Theme.Line, 0.5, 0.55, Enum.ApplyStrokeMode.Contextual)
+    stroke(tMain, self.Theme.Line, 0.5, 0.6, Enum.ApplyStrokeMode.Contextual)
 
     local function mkCtrl(sym, x, isClose)
         local b = inst("TextButton", {
             AnchorPoint = Vector2.new(1, 0.5),
             Position = UDim2.new(1, x, 0.5, 0),
-            Size = UDim2.new(0, 22, 0, 22),
+            Size = UDim2.new(0, 24, 0, 24),
             BackgroundColor3 = self.Theme.BG3,
             BorderSizePixel = 0,
             Text = sym,
             TextColor3 = isClose and self.Theme.ERR or self.Theme.Text,
             Font = self.Fonts.Regular,
-            TextSize = 12,
+            TextSize = 13,
             AutoButtonColor = false,
             Name = "ThemeBG3"
         }, titleBar)
-        corner(b, 4)
-        stroke(b, self.Theme.LineDim, 1, 0.5)
+        corner(b, 5)
+        stroke(b, self.Theme.LineDim, 0.8, 0.3)
         return b
     end
-    local btnClose = mkCtrl("×", -10, true)
-    local btnMin   = mkCtrl("—", -36, false)
+    local btnClose = mkCtrl("×", -12, true)
+    local btnMin   = mkCtrl("—", -42, false)
 
     local editorBox = inst("TextBox", {
-        Position = UDim2.new(0, 12, 0, 44),
-        Size = UDim2.new(1, -24, 1, -108),
+        Position = UDim2.new(0, 14, 0, 48),
+        Size = UDim2.new(1, -28, 1, -116),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
         Text = 'print("hello from LzeSilent")',
         PlaceholderText = "-- write lua here",
         TextColor3 = self.Theme.Text,
-        PlaceholderColor3 = self.Theme.TextDim,
+        PlaceholderColor3 = self.Theme.TextMute,
         Font = self.Fonts.Mono,
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
@@ -1638,20 +1650,20 @@ function Lib:CreateScriptEditor(cfg)
     }, main)
     pcall(function() editorBox.Multiline = true end)
     pcall(function() editorBox.TextWrapped = true end)
-    corner(editorBox, 4)
-    local ebs = stroke(editorBox, self.Theme.Line, 0.6, 0.6)
-    pad(editorBox, 8)
+    corner(editorBox, 5)
+    local ebs = stroke(editorBox, self.Theme.LineDim, 0.7, 0.4)
+    pad(editorBox, 10)
 
     local btnRow = inst("Frame", {
-        Position = UDim2.new(0, 12, 1, -52),
-        Size = UDim2.new(1, -24, 0, 26),
+        Position = UDim2.new(0, 14, 1, -58),
+        Size = UDim2.new(1, -28, 0, 28),
         BackgroundTransparency = 1
     }, main)
 
     local function mkActionBtn(text, x, w)
         local b = inst("TextButton", {
             Position = UDim2.new(0, x, 0, 0),
-            Size = UDim2.new(0, w, 0, 26),
+            Size = UDim2.new(0, w, 0, 28),
             BackgroundColor3 = self.Theme.BG3,
             BorderSizePixel = 0,
             Text = text,
@@ -1661,15 +1673,15 @@ function Lib:CreateScriptEditor(cfg)
             AutoButtonColor = false,
             Name = "ThemeBG3"
         }, btnRow)
-        corner(b, 4)
-        local s = stroke(b, self.Theme.Line, 0.6, 0.5)
+        corner(b, 5)
+        local s = stroke(b, self.Theme.LineDim, 0.7, 0.4)
         b.MouseEnter:Connect(function()
             tw(b, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.Hover })
             tw(s, Lib.TI.fast, { Transparency = 0 })
         end)
         b.MouseLeave:Connect(function()
             tw(b, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.BG3 })
-            tw(s, Lib.TI.fast, { Transparency = 0.5 })
+            tw(s, Lib.TI.fast, { Transparency = 0.4 })
         end)
         b.MouseButton1Down:Connect(function()
             tw(b, Lib.TI.tap, { BackgroundColor3 = Lib.Theme.BG2 })
@@ -1680,16 +1692,16 @@ function Lib:CreateScriptEditor(cfg)
         return b, s
     end
 
-    local runBtn = mkActionBtn("▶  Execute", 0, 110)
-    local clearBtn = mkActionBtn("Clear", 118, 70)
-    local saveBtn = mkActionBtn("Save File", 196, 90)
-    local copyBtn = mkActionBtn("Copy", 294, 60)
+    local runBtn = mkActionBtn("▶  Execute", 0, 120)
+    local clearBtn = mkActionBtn("Clear", 128, 76)
+    local saveBtn = mkActionBtn("Save File", 212, 96)
+    local copyBtn = mkActionBtn("Copy", 316, 70)
 
     editorBox.Focused:Connect(function()
-        tw(ebs, Lib.TI.fast, { Transparency = 0 })
+        tw(ebs, Lib.TI.fast, { Transparency = 0, Color = Lib.Theme.Line })
     end)
     editorBox.FocusLost:Connect(function()
-        tw(ebs, Lib.TI.fast, { Transparency = 0.6 })
+        tw(ebs, Lib.TI.fast, { Transparency = 0.4, Color = Lib.Theme.LineDim })
     end)
 
     local function executeCode(code)
@@ -1736,7 +1748,7 @@ function Lib:CreateScriptEditor(cfg)
     local saveDialog = inst("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0.5, 0, 0.5, 0),
-        Size = UDim2.new(0, 260, 0, 90),
+        Size = UDim2.new(0, 280, 0, 100),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
         Visible = false,
@@ -1744,10 +1756,10 @@ function Lib:CreateScriptEditor(cfg)
         Name = "ThemeBG2"
     }, main)
     corner(saveDialog, 6)
-    stroke(saveDialog, self.Theme.Line, 0.7, 0.2)
+    stroke(saveDialog, self.Theme.Line, 0.8, 0.2)
     inst("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 16),
-        Position = UDim2.new(0, 10, 0, 8),
+        Size = UDim2.new(1, -20, 0, 18),
+        Position = UDim2.new(0, 12, 0, 10),
         BackgroundTransparency = 1,
         Text = "Save as...",
         TextColor3 = self.Theme.Text,
@@ -1757,8 +1769,8 @@ function Lib:CreateScriptEditor(cfg)
         Name = "ThemeText"
     }, saveDialog)
     local nameInput = inst("TextBox", {
-        Position = UDim2.new(0, 10, 0, 30),
-        Size = UDim2.new(1, -20, 0, 24),
+        Position = UDim2.new(0, 12, 0, 34),
+        Size = UDim2.new(1, -24, 0, 26),
         BackgroundColor3 = self.Theme.BG3,
         BorderSizePixel = 0,
         Text = "myscript",
@@ -1768,22 +1780,22 @@ function Lib:CreateScriptEditor(cfg)
         ClearTextOnFocus = false,
         Name = "ThemeBG3"
     }, saveDialog)
-    corner(nameInput, 4)
-    stroke(nameInput, self.Theme.Line, 0.5, 0.6)
-    pad(nameInput, 4, 4, 8, 8)
-    local confirmSave = mkActionBtn("Save", 10, 80)
+    corner(nameInput, 5)
+    stroke(nameInput, self.Theme.LineDim, 0.6, 0.4)
+    pad(nameInput, 6, 6, 10, 10)
+    local confirmSave = mkActionBtn("Save", 12, 90)
     confirmSave.Parent = saveDialog
-    confirmSave.Position = UDim2.new(0, 10, 1, -30)
-    local cancelSave = mkActionBtn("Cancel", 100, 80)
+    confirmSave.Position = UDim2.new(0, 12, 1, -36)
+    local cancelSave = mkActionBtn("Cancel", 108, 90)
     cancelSave.Parent = saveDialog
-    cancelSave.Position = UDim2.new(0, 100, 1, -30)
+    cancelSave.Position = UDim2.new(0, 108, 1, -36)
 
     local function showSavePopup()
         saveDialog.Visible = true
         saveDialog.BackgroundTransparency = 1
-        saveDialog.Size = UDim2.new(0, 240, 0, 80)
+        saveDialog.Size = UDim2.new(0, 260, 0, 90)
         tw(saveDialog, Lib.TI.spring, {
-            Size = UDim2.new(0, 260, 0, 90),
+            Size = UDim2.new(0, 280, 0, 100),
             BackgroundTransparency = 0
         })
     end
@@ -1874,7 +1886,7 @@ function Lib:CreateScriptEditor(cfg)
         end)
     end)
     btnMin.MouseButton1Click:Connect(function()
-        tw(main, Lib.TI.med, { Size = UDim2.new(0, winSize.X.Offset, 0, 30) })
+        tw(main, Lib.TI.med, { Size = UDim2.new(0, winSize.X.Offset, 0, 32) })
         task.delay(0.5, function()
             tw(main, Lib.TI.spring, { Size = UDim2.new(0, winSize.X.Offset, 0, winSize.Y.Offset) })
         end)
