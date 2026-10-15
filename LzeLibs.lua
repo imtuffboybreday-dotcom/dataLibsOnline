@@ -2,24 +2,23 @@ local Lib = {}
 Lib.Version = "LzeSilent.UI v1.0.0"
 Lib.Flags = {}
 Lib.Windows = {}
-Lib.Connections = {}
 Lib.NotifyQueue = {}
 
 Lib.Theme = {
-    BG          = Color3.fromRGB(0, 0, 0),
-    BG2         = Color3.fromRGB(10, 10, 10),
-    BG3         = Color3.fromRGB(20, 20, 20),
-    BG4         = Color3.fromRGB(28, 28, 28),
-    Line        = Color3.fromRGB(255, 255, 255),
-    LineDim     = Color3.fromRGB(40, 40, 40),
-    Text        = Color3.fromRGB(255, 255, 255),
-    TextDim     = Color3.fromRGB(130, 130, 130),
-    Hover       = Color3.fromRGB(24, 24, 24),
-    OK          = Color3.fromRGB(74, 222, 128),
-    WARN        = Color3.fromRGB(251, 191, 36),
-    ERR         = Color3.fromRGB(248, 113, 113),
-    INFO        = Color3.fromRGB(96, 165, 250),
-    Accent      = Color3.fromRGB(255, 255, 255)
+    BG      = Color3.fromRGB(0, 0, 0),
+    BG2     = Color3.fromRGB(10, 10, 10),
+    BG3     = Color3.fromRGB(20, 20, 20),
+    BG4     = Color3.fromRGB(28, 28, 28),
+    Line    = Color3.fromRGB(255, 255, 255),
+    LineDim = Color3.fromRGB(40, 40, 40),
+    Text    = Color3.fromRGB(255, 255, 255),
+    TextDim = Color3.fromRGB(130, 130, 130),
+    Hover   = Color3.fromRGB(24, 24, 24),
+    OK      = Color3.fromRGB(74, 222, 128),
+    WARN    = Color3.fromRGB(251, 191, 36),
+    ERR     = Color3.fromRGB(248, 113, 113),
+    INFO    = Color3.fromRGB(96, 165, 250),
+    Accent  = Color3.fromRGB(255, 255, 255)
 }
 
 Lib.Fonts = {
@@ -212,7 +211,6 @@ function Lib:Notify(cfg)
     local text  = cfg.Text or ""
     local dur   = cfg.Duration or 4
     local kind  = cfg.Type or "info"
-
     local accent = self.Theme.INFO
     if kind == "success" then accent = self.Theme.OK
     elseif kind == "warning" then accent = self.Theme.WARN
@@ -324,9 +322,14 @@ Section.__index = Section
 
 local function updateSectionSize(sec)
     task.defer(function()
+        if not sec or not sec.Layout then return end
         local h = sec.Layout.AbsoluteContentSize.Y
-        sec.Container.Size = UDim2.new(1, 0, 0, h)
-        sec.Frame.Size = UDim2.new(1, 0, 0, h + 36)
+        if sec.Container then
+            sec.Container.Size = UDim2.new(1, 0, 0, h)
+        end
+        if sec.Frame then
+            sec.Frame.Size = UDim2.new(1, 0, 0, h + 36)
+        end
     end)
 end
 
@@ -335,7 +338,8 @@ local function mkElementFrame(parent, h)
         Size = UDim2.new(1, 0, 0, h),
         BackgroundColor3 = Lib.Theme.BG3,
         BorderSizePixel = 0,
-        Name = "ThemeBG3"
+        Name = "ThemeBG3",
+        ClipsDescendants = true
     }, parent)
     corner(f, 4)
     local s = stroke(f, Lib.Theme.Line, 0.6, 0.75)
@@ -732,7 +736,6 @@ function Section:AddDropdown(cfg)
         }, panel)
         corner(ob, 3)
 
-        local obT = ob:FindFirstChildOfClass("TextLabel")
         ob.MouseEnter:Connect(function()
             tw(ob, Lib.TI.fast, { BackgroundColor3 = Lib.Theme.BG4 })
         end)
@@ -966,7 +969,8 @@ function Section:AddParagraph(cfg)
         Size = UDim2.new(1, 0, 0, 40),
         BackgroundColor3 = Lib.Theme.BG3,
         BorderSizePixel = 0,
-        Name = "ThemeBG3"
+        Name = "ThemeBG3",
+        ClipsDescendants = true
     }, self.Container)
     corner(f, 4)
     stroke(f, Lib.Theme.Line, 0.6, 0.75)
@@ -1136,7 +1140,8 @@ function TabMeta:CreateSection(title)
         Size = UDim2.new(1, 0, 0, 30),
         BackgroundColor3 = Lib.Theme.BG2,
         BorderSizePixel = 0,
-        Name = "ThemeBG2"
+        Name = "ThemeBG2",
+        ClipsDescendants = true
     }, self.Page)
     corner(frame, 4)
     stroke(frame, Lib.Theme.Line, 0.6, 0.7)
@@ -1215,7 +1220,8 @@ function Lib:CreateWindow(cfg)
         Size = UDim2.new(1, 0, 0, 30),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
-        Name = "ThemeBG2"
+        Name = "ThemeBG2",
+        ClipsDescendants = true
     }, main)
 
     inst("Frame", {
@@ -1304,14 +1310,16 @@ function Lib:CreateWindow(cfg)
         Size = UDim2.new(1, 0, 1, -31),
         BackgroundColor3 = self.Theme.BG,
         BorderSizePixel = 0,
-        Name = "ThemeBG"
+        Name = "ThemeBG",
+        ClipsDescendants = true
     }, main)
 
     local sidebar = inst("Frame", {
         Size = UDim2.new(0, 120, 1, 0),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
-        Name = "ThemeBG2"
+        Name = "ThemeBG2",
+        ClipsDescendants = true
     }, body)
 
     inst("Frame", {
@@ -1454,7 +1462,9 @@ function Lib:CreateWindow(cfg)
             ScrollBarImageColor3 = self.Theme.Line,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Visible = false
+            Visible = false,
+            ClipsDescendants = true,
+            ScrollingDirection = Enum.ScrollingDirection.Y
         }, content)
         pad(page, 10)
         inst("UIListLayout", {
@@ -1549,7 +1559,8 @@ function Lib:CreateScriptEditor(cfg)
         Size = UDim2.new(1, 0, 0, 30),
         BackgroundColor3 = self.Theme.BG2,
         BorderSizePixel = 0,
-        Name = "ThemeBG2"
+        Name = "ThemeBG2",
+        ClipsDescendants = true
     }, main)
     inst("Frame", {
         Size = UDim2.new(1, 0, 0, 1),
@@ -1560,7 +1571,7 @@ function Lib:CreateScriptEditor(cfg)
     }, titleBar)
 
     local titleHolder = inst("Frame", {
-        Size = UDim2.new(0, 200, 0, 16),
+        Size = UDim2.new(0, 220, 0, 16),
         Position = UDim2.new(0, 8, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundTransparency = 1
@@ -1623,9 +1634,10 @@ function Lib:CreateScriptEditor(cfg)
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Top,
         ClearTextOnFocus = false,
-        MultiLine = true,
         Name = "ThemeBG2"
     }, main)
+    pcall(function() editorBox.Multiline = true end)
+    pcall(function() editorBox.TextWrapped = true end)
     corner(editorBox, 4)
     local ebs = stroke(editorBox, self.Theme.Line, 0.6, 0.6)
     pad(editorBox, 8)
@@ -1929,7 +1941,7 @@ function Lib:LoadConfig(name)
         return false
     end
     local decoded
-    local ok2, err2 = pcall(function() decoded = HttpService:JSONDecode(content) end)
+    local ok2 = pcall(function() decoded = HttpService:JSONDecode(content) end)
     if not ok2 then
         self:Notify({ Title = "Config", Text = "corrupt file", Type = "error" })
         return false
